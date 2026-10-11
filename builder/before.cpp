@@ -1,32 +1,40 @@
 #include <iostream>
 #include <string>
 
-class Computer {
+class Burger {
 private:
-    std::string cpu;
-    int ramGb;
-    int storageGb;
-    std::string gpu;
-    bool wifi;
-    bool bluetooth;
+    std::string bun;
+    std::string patty;
+    std::string sauce;
+    bool cheese;
+    bool lettuce;
+    bool tomato;
+    bool onion;
 
 public:
-    Computer(std::string cpu, int ramGb, int storageGb, std::string gpu, bool wifi, bool bluetooth)
-        : cpu(std::move(cpu)), ramGb(ramGb), storageGb(storageGb),
-          gpu(std::move(gpu)), wifi(wifi), bluetooth(bluetooth) {}
+    Burger(std::string bun, std::string patty, std::string sauce,
+           bool cheese, bool lettuce, bool tomato, bool onion)
+        : bun(std::move(bun)), patty(std::move(patty)), sauce(std::move(sauce)),
+          cheese(cheese), lettuce(lettuce), tomato(tomato), onion(onion) {}
 
-    void showSpecs() const {
-        std::cout << "CPU: " << cpu << "\n";
-        std::cout << "RAM: " << ramGb << " GB\n";
-        std::cout << "Storage: " << storageGb << " GB\n";
-        std::cout << "GPU: " << gpu << "\n";
-        std::cout << "WiFi: " << wifi << ", Bluetooth: " << bluetooth << "\n";
+    void show() const {
+        std::cout << "Bun: " << bun << "\n";
+        std::cout << "Patty: " << patty << "\n";
+        std::cout << "Sauce: " << sauce << "\n";
+        std::cout << std::boolalpha
+                  << "Cheese: " << cheese << ", Lettuce: " << lettuce
+                  << ", Tomato: " << tomato << ", Onion: " << onion << "\n";
     }
 };
 
 int main() {
-    Computer office("Intel i5", 16, 512, "Integrated", true, false);
-    office.showSpecs();
+    Burger classic("Sesame", "Beef", "Ketchup", true, true, false, true);
+    classic.show();
+
+    std::cout << "\n";
+
+    Burger empty("", "", "", false, false, false, false);
+    empty.show();
 
     return 0;
 }

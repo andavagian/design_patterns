@@ -4,21 +4,33 @@
 
 ## Before
 
-In `before.cpp`, `Computer` has one big constructor with 6 parameters (**telescoping constructor**):
+In `before.cpp`, `Burger` has one big constructor with 7 parameters (**telescoping constructor**):
 
 ```cpp
-Computer office("Intel i5", 16, 512, "Integrated", true, false);
+Burger classic("Sesame", "Beef", "Ketchup", true, true, false, true);
 ```
 
-It is hard to remember the order of arguments, and `true, false` says nothing about their meaning.
+* It is hard to remember the order of arguments.
+* `true, true, false, true` says nothing about which topping is which.
+* Nothing stops us from creating a burger without a bun or a patty.
 
 ## After
 
-In `after.cpp`, `Computer::Builder` builds the object step by step:
+In `after.cpp`, `BurgerBuilder` builds the burger step by step:
 
-* required fields (`cpu`, `ramGb`) are passed to the Builder constructor
-* optional fields have default values and are set with methods
+* `setBun()`, `setPatty()`, `setSauce()` set the main parts
+* `addCheese()`, `addLettuce()`, `addTomato()`, `addOnion()` add toppings
 * every method returns `*this` -> **fluent interface** (method chaining)
-* `build()` returns the finished `Computer`
+* `build()` checks that the burger has a bun and a patty, then returns it
 
-The `Computer` constructor is `private`, so a computer can only be created through its Builder.
+The `Burger` constructor is `private` and `BurgerBuilder` is its `friend`, so a burger can only be created through the builder.
+
+```cpp
+Burger classic = BurgerBuilder()
+    .setBun("Sesame")
+    .setPatty("Beef")
+    .setSauce("Ketchup")
+    .addCheese()
+    .addLettuce()
+    .build();
+```
