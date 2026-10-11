@@ -4,10 +4,10 @@
 
 ## Before
 
-In `before.cpp`, the client code creates objects directly with `new` inside an `if / else if` chain.
+In `before.cpp`, `planDelivery()` creates transports directly with `new` inside an `if / else if` chain.
 
-* The client depends on **every** concrete class.
-* Adding a new notification type means changing the client code.
+* The delivery code depends on **every** concrete transport (`Truck`, `Ship`).
+* Adding rail delivery means changing `planDelivery()`, so `"rail"` currently fails.
 * Memory is managed manually with `delete`.
 
 ## After
@@ -16,9 +16,11 @@ In `after.cpp`:
 
 | Role | Class |
 |---|---|
-| Product | `Notification` |
-| Concrete Products | `EmailNotification`, `SmsNotification`, `PushNotification` |
-| Creator | `NotificationFactory` (has `createNotification()`) |
-| Concrete Creators | `EmailFactory`, `SmsFactory`, `PushFactory` |
+| Product | `Transport` |
+| Concrete Products | `Truck`, `Ship`, `Train` |
+| Creator | `Logistics` (has the factory method `createTransport()`) |
+| Concrete Creators | `RoadLogistics`, `SeaLogistics`, `RailLogistics` |
 
-The client only works with `NotificationFactory` and `Notification`. Objects are returned as `std::unique_ptr`, so no manual `delete` is needed.
+`Logistics::planDelivery()` works only with the `Transport` interface. Every subclass decides which transport to create.
+
+Rail delivery was added with two **new** classes (`Train` and `RailLogistics`), without changing existing code. Objects are returned as `std::unique_ptr`, so no manual `delete` is needed.

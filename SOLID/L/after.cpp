@@ -1,65 +1,82 @@
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
-class BankAccount {
+class Bird {
 protected:
-    double balance;
+    std::string name;
 
 public:
-    explicit BankAccount(double balance) : balance(balance) {}
-    virtual ~BankAccount() = default;
+    explicit Bird(std::string name) : name(std::move(name)) {}
+    virtual ~Bird() = default;
 
-    virtual void deposit(double amount) {
-        balance += amount;
-        std::cout << "Deposited $" << amount << ", balance: $" << balance << "\n";
+    virtual void move() const = 0;
+
+    void layEgg() const {
+        std::cout << name << " laid an egg\n";
     }
 };
 
-class WithdrawableAccount : public BankAccount {
+class FlyingBird : public Bird {
 public:
-    using BankAccount::BankAccount;
+    using Bird::Bird;
 
-    virtual void withdraw(double amount) {
-        balance -= amount;
-        std::cout << "Withdrew $" << amount << ", balance: $" << balance << "\n";
+    virtual void fly() const {
+        std::cout << name << " is flying\n";
+    }
+
+    void move() const override { fly(); }
+};
+
+class Eagle : public FlyingBird {
+public:
+    using FlyingBird::FlyingBird;
+
+    void fly() const override {
+        std::cout << name << " is soaring high\n";
     }
 };
 
-class SavingsAccount : public WithdrawableAccount {
+class Sparrow : public FlyingBird {
 public:
-    using WithdrawableAccount::WithdrawableAccount;
+    using FlyingBird::FlyingBird;
 };
 
-class CheckingAccount : public WithdrawableAccount {
+class Penguin : public Bird {
 public:
-    using WithdrawableAccount::WithdrawableAccount;
+    using Bird::Bird;
+
+    void swim() const {
+        std::cout << name << " is swimming\n";
+    }
+
+    void move() const override { swim(); }
 };
 
-class FixedDepositAccount : public BankAccount {
-public:
-    using BankAccount::BankAccount;
-};
-
-void withdrawFromAll(const std::vector<std::shared_ptr<WithdrawableAccount>>& accounts, double amount) {
-    for (const auto& account : accounts) {
-        account->withdraw(amount);
+void letBirdsFly(const std::vector<std::shared_ptr<FlyingBird>>& birds) {
+    for (const auto& bird : birds) {
+        bird->fly();
     }
 }
 
-void depositToAll(const std::vector<std::shared_ptr<BankAccount>>& accounts, double amount) {
-    for (const auto& account : accounts) {
-        account->deposit(amount);
+void moveAllBirds(const std::vector<std::shared_ptr<Bird>>& birds) {
+    for (const auto& bird : birds) {
+        bird->move();
+        bird->layEgg();
     }
 }
 
 int main() {
-    auto savings = std::make_shared<SavingsAccount>(500.0);
-    auto checking = std::make_shared<CheckingAccount>(300.0);
-    auto fixed = std::make_shared<FixedDepositAccount>(1000.0);
+    auto eagle = std::make_shared<Eagle>("Eagle");
+    auto sparrow = std::make_shared<Sparrow>("Sparrow");
+    auto penguin = std::make_shared<Penguin>("Penguin");
 
-    withdrawFromAll({savings, checking}, 100.0);
-    depositToAll({savings, checking, fixed}, 50.0);
+    std::cout << "--- Flying birds ---\n";
+    letBirdsFly({eagle, sparrow});
+
+    std::cout << "\n--- All birds ---\n";
+    moveAllBirds({eagle, sparrow, penguin});
 
     return 0;
 }

@@ -1,54 +1,59 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
-class BankAccount {
+class Bird {
 protected:
-    double balance;
+    std::string name;
 
 public:
-    explicit BankAccount(double balance) : balance(balance) {}
-    virtual ~BankAccount() = default;
+    explicit Bird(std::string name) : name(std::move(name)) {}
+    virtual ~Bird() = default;
 
-    virtual void deposit(double amount) {
-        balance += amount;
-        std::cout << "Deposited $" << amount << ", balance: $" << balance << "\n";
-    }
-
-    virtual void withdraw(double amount) {
-        balance -= amount;
-        std::cout << "Withdrew $" << amount << ", balance: $" << balance << "\n";
+    virtual void fly() const {
+        std::cout << name << " is flying\n";
     }
 };
 
-class SavingsAccount : public BankAccount {
+class Eagle : public Bird {
 public:
-    using BankAccount::BankAccount;
-};
+    using Bird::Bird;
 
-class FixedDepositAccount : public BankAccount {
-public:
-    using BankAccount::BankAccount;
-
-    void withdraw(double) override {
-        throw std::logic_error("Withdrawal is not allowed for fixed deposits!");
+    void fly() const override {
+        std::cout << name << " is soaring high\n";
     }
 };
 
-void withdrawFromAll(const std::vector<std::shared_ptr<BankAccount>>& accounts, double amount) {
-    for (const auto& account : accounts) {
-        account->withdraw(amount);
+class Sparrow : public Bird {
+public:
+    using Bird::Bird;
+};
+
+class Penguin : public Bird {
+public:
+    using Bird::Bird;
+
+    void fly() const override {
+        throw std::logic_error(name + " cannot fly!");
+    }
+};
+
+void letBirdsFly(const std::vector<std::unique_ptr<Bird>>& birds) {
+    for (const auto& bird : birds) {
+        bird->fly();
     }
 }
 
 int main() {
-    std::vector<std::shared_ptr<BankAccount>> accounts;
-    accounts.push_back(std::make_shared<SavingsAccount>(500.0));
-    accounts.push_back(std::make_shared<FixedDepositAccount>(1000.0));
+    std::vector<std::unique_ptr<Bird>> birds;
+    birds.push_back(std::make_unique<Eagle>("Eagle"));
+    birds.push_back(std::make_unique<Sparrow>("Sparrow"));
+    birds.push_back(std::make_unique<Penguin>("Penguin"));
 
     try {
-        withdrawFromAll(accounts, 100.0);
+        letBirdsFly(birds);
     } catch (const std::exception& e) {
         std::cout << "Error: " << e.what() << "\n";
     }

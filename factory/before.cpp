@@ -1,49 +1,48 @@
 #include <iostream>
 #include <string>
 
-class Notification {
+class Transport {
 public:
-    virtual ~Notification() = default;
-    virtual void send(const std::string& message) const = 0;
+    virtual ~Transport() = default;
+    virtual void deliver(const std::string& cargo) const = 0;
 };
 
-class EmailNotification : public Notification {
+class Truck : public Transport {
 public:
-    void send(const std::string& message) const override {
-        std::cout << "Email: " << message << "\n";
+    void deliver(const std::string& cargo) const override {
+        std::cout << "Truck delivers " << cargo << " by road\n";
     }
 };
 
-class SmsNotification : public Notification {
+class Ship : public Transport {
 public:
-    void send(const std::string& message) const override {
-        std::cout << "SMS: " << message << "\n";
+    void deliver(const std::string& cargo) const override {
+        std::cout << "Ship delivers " << cargo << " by sea\n";
     }
 };
 
-class PushNotification : public Notification {
-public:
-    void send(const std::string& message) const override {
-        std::cout << "Push: " << message << "\n";
+void planDelivery(const std::string& type, const std::string& cargo) {
+    Transport* transport = nullptr;
+
+    if (type == "road") {
+        transport = new Truck();
+    } else if (type == "sea") {
+        transport = new Ship();
     }
-};
+
+    if (transport == nullptr) {
+        std::cout << "Unknown delivery type: " << type << "\n";
+        return;
+    }
+
+    transport->deliver(cargo);
+    delete transport;
+}
 
 int main() {
-    std::string type = "sms";
-
-    Notification* notification = nullptr;
-    if (type == "email") {
-        notification = new EmailNotification();
-    } else if (type == "sms") {
-        notification = new SmsNotification();
-    } else if (type == "push") {
-        notification = new PushNotification();
-    }
-
-    if (notification) {
-        notification->send("Your package is on the way!");
-        delete notification;
-    }
+    planDelivery("road", "furniture");
+    planDelivery("sea", "containers");
+    planDelivery("rail", "coal");
 
     return 0;
 }

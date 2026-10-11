@@ -1,75 +1,78 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
-class Notification {
+class Transport {
 public:
-    virtual ~Notification() = default;
-    virtual void send(const std::string& message) const = 0;
+    virtual ~Transport() = default;
+    virtual void deliver(const std::string& cargo) const = 0;
 };
 
-class EmailNotification : public Notification {
+class Truck : public Transport {
 public:
-    void send(const std::string& message) const override {
-        std::cout << "Email: " << message << "\n";
+    void deliver(const std::string& cargo) const override {
+        std::cout << "Truck delivers " << cargo << " by road\n";
     }
 };
 
-class SmsNotification : public Notification {
+class Ship : public Transport {
 public:
-    void send(const std::string& message) const override {
-        std::cout << "SMS: " << message << "\n";
+    void deliver(const std::string& cargo) const override {
+        std::cout << "Ship delivers " << cargo << " by sea\n";
     }
 };
 
-class PushNotification : public Notification {
+class Train : public Transport {
 public:
-    void send(const std::string& message) const override {
-        std::cout << "Push: " << message << "\n";
+    void deliver(const std::string& cargo) const override {
+        std::cout << "Train delivers " << cargo << " by rail\n";
     }
 };
 
-class NotificationFactory {
+class Logistics {
 public:
-    virtual ~NotificationFactory() = default;
-    virtual std::unique_ptr<Notification> createNotification() const = 0;
+    virtual ~Logistics() = default;
+    virtual std::unique_ptr<Transport> createTransport() const = 0;
 
-    void notify(const std::string& message) const {
-        auto notification = createNotification();
-        notification->send(message);
+    void planDelivery(const std::string& cargo) const {
+        std::unique_ptr<Transport> transport = createTransport();
+        transport->deliver(cargo);
     }
 };
 
-class EmailFactory : public NotificationFactory {
+class RoadLogistics : public Logistics {
 public:
-    std::unique_ptr<Notification> createNotification() const override {
-        return std::make_unique<EmailNotification>();
+    std::unique_ptr<Transport> createTransport() const override {
+        return std::make_unique<Truck>();
     }
 };
 
-class SmsFactory : public NotificationFactory {
+class SeaLogistics : public Logistics {
 public:
-    std::unique_ptr<Notification> createNotification() const override {
-        return std::make_unique<SmsNotification>();
+    std::unique_ptr<Transport> createTransport() const override {
+        return std::make_unique<Ship>();
     }
 };
 
-class PushFactory : public NotificationFactory {
+class RailLogistics : public Logistics {
 public:
-    std::unique_ptr<Notification> createNotification() const override {
-        return std::make_unique<PushNotification>();
+    std::unique_ptr<Transport> createTransport() const override {
+        return std::make_unique<Train>();
     }
 };
 
 int main() {
-    std::unique_ptr<NotificationFactory> factory = std::make_unique<SmsFactory>();
-    factory->notify("Your package is on the way!");
+    std::vector<std::unique_ptr<Logistics>> companies;
+    companies.push_back(std::make_unique<RoadLogistics>());
+    companies.push_back(std::make_unique<SeaLogistics>());
+    companies.push_back(std::make_unique<RailLogistics>());
 
-    factory = std::make_unique<EmailFactory>();
-    factory->notify("Your package is on the way!");
+    std::vector<std::string> cargo = {"furniture", "containers", "coal"};
 
-    factory = std::make_unique<PushFactory>();
-    factory->notify("Your package is on the way!");
+    for (std::size_t i = 0; i < companies.size(); ++i) {
+        companies[i]->planDelivery(cargo[i]);
+    }
 
     return 0;
 }

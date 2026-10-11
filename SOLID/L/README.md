@@ -4,25 +4,28 @@
 
 ## Before
 
-In `before.cpp`, `BankAccount` has a `withdraw()` method.
+In `before.cpp`, the `Bird` class has a `fly()` method, so it promises that **every** bird can fly.
 
-`FixedDepositAccount` inherits from `BankAccount`, but money cannot be withdrawn from a fixed deposit, so it throws an exception.
+`Penguin` inherits from `Bird`, but penguins cannot fly, so its `fly()` throws an exception.
 
-`withdrawFromAll()` expects every `BankAccount` to support `withdraw()`, so the program breaks. **This is an LSP violation.**
+`letBirdsFly()` expects every `Bird` to fly, and the program breaks on the penguin. **This is an LSP violation.**
 
 ## After
 
-In `after.cpp`, the base class contains only the behavior shared by all accounts (`deposit()`).
+In `after.cpp`, the base class `Bird` contains only what **all** birds can do: `move()` and `layEgg()`.
 
-`withdraw()` is moved to `WithdrawableAccount`:
+`fly()` is moved to `FlyingBird`, and `Penguin` has its own `swim()`:
 
 ```text
-            BankAccount
-           /           \
-WithdrawableAccount   FixedDepositAccount
-     /        \
-Savings     Checking
+            Bird
+           /    \
+   FlyingBird   Penguin
+     /     \
+  Eagle   Sparrow
 ```
+
+* `letBirdsFly()` accepts only `FlyingBird`, so a penguin can never get there.
+* `moveAllBirds()` accepts any `Bird`, and every bird moves in its own way (fly or swim).
 
 Now every child can safely replace its parent.
 
